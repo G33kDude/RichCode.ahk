@@ -1,0 +1,1 @@
+# RichCode.ahk
