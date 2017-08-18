@@ -156,6 +156,18 @@ class RichCode
 		}
 	}
 	
+	Modified[]
+	{
+		get {
+			return this.SendMsg(0xB8, 0, 0) ; EM_GETMODIFY
+		}
+		
+		set {
+			this.SendMsg(0xB9, Value, 0) ; EM_SETMODIFY
+			return Value
+		}
+	}
+	
 	; --- Construction, Destruction, Meta-Functions ---
 	
 	__New(Settings, Options:="")
