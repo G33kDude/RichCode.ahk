@@ -87,8 +87,8 @@ class RichCode
 		get {
 			Selection := this.Selection, Length := Selection[2] - Selection[1]
 			VarSetCapacity(Buffer, (Length + 1) * 2) ; +1 for null terminator
-			if (this.SendMsg(0x43E, 0, &Buffer) != Length) ; EM_GETSELTEXT
-				throw Exception("Selection text length mismatch!")
+			if (this.SendMsg(0x43E, 0, &Buffer) > Length) ; EM_GETSELTEXT
+				throw Exception("Text larger than selection! Buffer overflow!")
 			Text := StrGet(&Buffer, Selection[2]-Selection[1], "UTF-16")
 			return StrReplace(Text, "`r", "`n")
 		}
