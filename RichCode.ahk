@@ -315,11 +315,13 @@ class RichCode
 		
 		; Save the scroll and cursor positions, update the text,
 		; then restore the scroll and cursor positions
+		MODIFY := this.SendMsg(0xB8, 0, 0)    ; EM_GETMODIFY
 		this.SendMsg(0x4DD, 0, &POINT)        ; EM_GETSCROLLPOS
 		this.SendMsg(0x434, 0, &CHARRANGE)    ; EM_EXGETSEL
 		this.SendMsg(0x461, &SETTEXTEX, &Buf) ; EM_SETTEXTEX
 		this.SendMsg(0x437, 0, &CHARRANGE)    ; EM_EXSETSEL
 		this.SendMsg(0x4DE, 0, &POINT)        ; EM_SETSCROLLPOS
+		this.SendMsg(0xB9, MODIFY, 0)         ; EM_SETMODIFY
 		
 		; Restore previous settings
 		Critical, %PrevCritical%
