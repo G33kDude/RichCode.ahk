@@ -51,39 +51,39 @@ HighlightAHK(Settings, ByRef Code)
 	Pos := 1
 	while (FoundPos := RegExMatch(Code, Needle, Match, Pos))
 	{
-		RTF .= "\cf0 " EscapeRTF(SubStr(Code, Pos, FoundPos-Pos))
+		RTF .= "\cf1 " EscapeRTF(SubStr(Code, Pos, FoundPos-Pos))
 		
 		; Flat block of if statements for performance
 		if (Match.Value(1) != "")
-			RTF .= "\cf1"
-		else if (Match.Value(2) != "")
 			RTF .= "\cf2"
-		else if (Match.Value(3) != "")
+		else if (Match.Value(2) != "")
 			RTF .= "\cf3"
-		else if (Match.Value(4) != "")
+		else if (Match.Value(3) != "")
 			RTF .= "\cf4"
-		else if (Match.Value(5) != "")
+		else if (Match.Value(4) != "")
 			RTF .= "\cf5"
-		else if (Match.Value(6) != "")
+		else if (Match.Value(5) != "")
 			RTF .= "\cf6"
-		else if (Match.Value(7) != "")
+		else if (Match.Value(6) != "")
 			RTF .= "\cf7"
-		else if (Match.Value(8) != "")
+		else if (Match.Value(7) != "")
 			RTF .= "\cf8"
-		else if (Match.Value(9) != "")
+		else if (Match.Value(8) != "")
 			RTF .= "\cf9"
-		else if (Match.Value(10) != "")
+		else if (Match.Value(9) != "")
 			RTF .= "\cf10"
-		else if (Match.Value(11) != "")
+		else if (Match.Value(10) != "")
 			RTF .= "\cf11"
-		else if (Match.Value(12) != "")
+		else if (Match.Value(11) != "")
 			RTF .= "\cf12"
+		else if (Match.Value(12) != "")
+			RTF .= "\cf13"
 		else
-			RTF .= "\cf0"
+			RTF .= "\cf1"
 		
 		RTF .= " " EscapeRTF(Match.Value())
 		Pos := FoundPos + Match.Len()
 	}
 	
-	return RTFHeader . RTF "\cf0 " EscapeRTF(SubStr(Code, Pos)) "\`n}"
+	return RTFHeader . RTF "\cf1 " EscapeRTF(SubStr(Code, Pos)) "\`n}"
 }

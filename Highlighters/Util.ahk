@@ -3,7 +3,7 @@
 	RTF := "{\urtf"
 	
 	; Color Table
-	RTF .= "{\colortbl"
+	RTF .= "{\colortbl;"
 	for each, Color in [Settings.FGColor, Settings.Colors*]
 	{
 		RTF .= "\red"   Color>>16 & 0xFF
