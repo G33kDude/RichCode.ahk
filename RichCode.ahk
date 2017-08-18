@@ -94,9 +94,8 @@ class RichCode
 		}
 		
 		set {
-			Selection := this.Selection
 			this.SendMsg(0xC2, 1, &Value) ; EM_REPLACESEL
-			this.Selection := [Selection[1], Selection[1]+StrLen(Value)]
+			this.Selection[1] -= StrLen(Value)
 			return Value
 		}
 	}
