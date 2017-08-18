@@ -247,6 +247,7 @@ class RichCode
 				{
 					; TODO: Trim to size needed to reach next TabSize
 					this.SelectedText := this.Settings.Indent
+					this.Selection[1] := this.Selection[2] ; Place cursor after
 				}
 				return False
 			}
@@ -255,6 +256,7 @@ class RichCode
 			else if (wParam == GetKeyVK("v") && GetKeyState("Ctrl"))
 			{
 				this.SelectedText := Clipboard ; Strips formatting
+				this.Selection[1] := this.Selection[2] ; Place cursor after
 				return False
 			}
 		}
