@@ -179,7 +179,11 @@ class RichCode
 		
 		Gui, Add, Custom, ClassRichEdit50W hWndhWnd +0x5031b1c4 +E0x20000 %Options%
 		this.hWnd := hWnd
-		
+
+		; Enable WordWrap in RichEdit control ("WordWrap" : true)
+		if this.Settings.WordWrap
+			SendMessage, 0x0448, 0, 0, , % "ahk_id " . This.HWND
+
 		; Register for WM_COMMAND and WM_NOTIFY events
 		; NOTE: this prevents garbage collection of
 		; the class until the control is destroyed
