@@ -5,6 +5,7 @@ SetWorkingDir, %A_ScriptDir%
 #Include %A_ScriptDir%\..
 #Include RichCode.ahk
 #Include Highlighters\AHK.ahk
+#Include Highlighters\CSS.ahk
 #Include Highlighters\HTML.ahk
 
 ; Table of supported languages and sample codes for the demo
@@ -18,6 +19,10 @@ Codes :=
 	"HTML": {
 		"Highlighter": "HighlightHTML",
 		"Code": FileOpen("Language Samples\Sample.html", "r").Read()
+	},
+	"CSS": {
+		"Highlighter": "HighlightCSS",
+		"Code": FileOpen("Language Samples\Sample.css", "r").Read()
 	},
 	"Plain": {
 		"Highlighter": "",
@@ -61,7 +66,7 @@ Settings :=
 Settings.RTFHeader := GenRTFHeader(Settings)
 
 ; Add some controls
-Gui, Add, DropDownList, gChangeLang vLanguage, AHK||HTML|Plain
+Gui, Add, DropDownList, gChangeLang vLanguage, AHK||CSS|HTML|Plain
 Gui, Add, Button, ym gBlockComment, Block &Comment
 Gui, Add, Button, ym gBlockUncomment, Block &Uncomment
 
@@ -97,6 +102,8 @@ if (Language == "AHK")
 	RC.IndentSelection(False, ";")
 else if (Language == "HTML")
 	RC.SelectedText := "<!-- " RC.SelectedText " -->"
+else if (Language == "CSS")
+	RC.SelectedText := "/* " RC.SelectedText " */"
 return
 
 BlockUncomment:
@@ -108,6 +115,8 @@ if (Language == "AHK")
 	RC.IndentSelection(True, ";")
 else if (Language == "HTML")
 	RC.SelectedText := RegExReplace(RC.SelectedText, "s)<!-- ?(.+?) ?-->", "$1")
+else if (Language == "CSS")
+	RC.SelectedText := RegExReplace(RC.SelectedText, "s)\/\* ?(.+?) ?\*\/", "$1")
 return
 
 ChangeLang:
