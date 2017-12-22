@@ -28,19 +28,19 @@ HighlightAHK(Settings, ByRef Code)
 	, Needle := "
 	( LTrim Join Comments
 		ODims)
-		((?:^|\s);[^\n]+)         ; Comments
-		|(^\s*\/\*.+?\n\s*\*\/)   ; Multiline comments
-		|((?:^|\s)#[^ \t\r\n,]+)  ; Directives
+		((?:^|\s);[^\n]+)          ; Comments
+		|(^\s*\/\*.+?\n\s*\*\/)    ; Multiline comments
+		|((?:^|\s)#[^ \t\r\n,]+)   ; Directives
 		|([+*!~&\/\\<>^|=?:
-			,().```%{}\[\]\-]+)   ; Punctuation
-		|(0x[0-9a-fA-F]+|[0-9]+)  ; Numbers
-		|(""[^""\r\n]*"")         ; Strings
-		|\b(A_\w*|" Builtins ")\b ; A_Builtins
-		|\b(" Flow ")\b           ; Flow
-		|\b(" Commands ")\b       ; Commands
-		|\b(" Functions ")\b      ; Functions
-		|\b(" Keynames ")\b       ; Keynames
-		|\b(" Keywords ")\b       ; Other keywords
+			,().```%{}\[\]\-]+)    ; Punctuation
+		|\b(0x[0-9a-fA-F]+|[0-9]+) ; Numbers
+		|(""[^""\r\n]*"")          ; Strings
+		|\b(A_\w*|" Builtins ")\b  ; A_Builtins
+		|\b(" Flow ")\b            ; Flow
+		|\b(" Commands ")\b        ; Commands
+		|\b(" Functions ")\b       ; Functions
+		|\b(" Keynames ")\b        ; Keynames
+		|\b(" Keywords ")\b        ; Other keywords
 	)"
 	
 	if (Settings.RTFHeader == "")
