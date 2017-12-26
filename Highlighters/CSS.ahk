@@ -2,7 +2,7 @@
 
 /*
 	Colors indices used:
-	
+
 	1: NOT USED
 	2: Multiline Comments
 	3: Hex Color Codes
@@ -20,6 +20,9 @@ HighlightCSS(Settings, ByRef Code, RTFHeader:="")
 	( LTrim Join Comments
 		ODims)
 		(\/\*.*?\*\/)                     ; Multiline comments
+		|(\.[a-zA-Z_\-0-9]+)(?![^{]*\})   ; Classes
+		|(\#[a-zA-Z_\-0-9]+)(?![^{]*\})   ; IDs
+		|([a-zA-Z]+)(?![^{]*\})           ; Normal elements
 		|(#[0-9a-fA-F]{3,8}\b)            ; Color code
 		|\b((?:0x[0-9a-fA-F]+|[0-9]+)     ; Numbers
 			(?:\s*(?:em|ex|%|px|cm
@@ -30,36 +33,42 @@ HighlightCSS(Settings, ByRef Code, RTFHeader:="")
 		|(""[^""]*""|'[^']*')             ; String
 		|([\w-]+\s*(?=:[^:]))             ; Properties
 	)"
-	
+
 	if (Settings.RTFHeader == "")
 		RTFHeader := GenRTFHeader(Settings)
 	else
 		RTFHeader := Settings.RTFHeader
-	
+
 	Pos := 1
 	while (FoundPos := RegExMatch(Code, Needle, Match, Pos))
 	{
 		RTF .= "\cf1 " EscapeRTF(SubStr(Code, Pos, FoundPos-Pos))
-		
+
 		; Flat block of if statements for performance
 		if (Match.Value(1) != "")
 			RTF .= "\cf3"
 		else if (Match.Value(2) != "")
-			RTF .= "\cf4"
+			RTF .= "\cf8"
 		else if (Match.Value(3) != "")
-			RTF .= "\cf6"
+			RTF .= "\cf8"
 		else if (Match.Value(4) != "")
-			RTF .= "\cf5"
+			RTF .= "\cf9"
 		else if (Match.Value(5) != "")
-			RTF .= "\cf7"
+			RTF .= "\cf4"
 		else if (Match.Value(6) != "")
-			RTF .= "\cf10"
+			RTF .= "\cf6"
+		else if (Match.Value(7) != "")
+			RTF .= "\cf5"
+		else if (Match.Value(8) != "")
+			RTF .= "\cf7"
+		else if (Match.Value(9) != "")
+			RTF .= "\i\cf10"
 		else
 			RTF .= "\cf1"
-		
-		RTF .= " " EscapeRTF(Match.Value())
+
+		RTF .= " " EscapeRTF(Match.Value()) "\plain"
 		Pos := FoundPos + Match.Len()
 	}
-	
+
 	return RTFHeader . RTF "\cf1 " EscapeRTF(SubStr(Code, Pos)) "\`n}"
 }

@@ -2,7 +2,7 @@
 
 /*
 	Colors indices used:
-	
+
 	1:  Comments
 	2:  Multiline comments
 	3:  Directives
@@ -32,27 +32,28 @@ HighlightAHK(Settings, ByRef Code)
 		|(^\s*\/\*.+?\n\s*\*\/)    ; Multiline comments
 		|((?:^|\s)#[^ \t\r\n,]+)   ; Directives
 		|([+*!~&\/\\<>^|=?:
-			,().```%{}\[\]\-]+)    ; Punctuation
+			.```%\-]+)             ; Punctuation
 		|\b(0x[0-9a-fA-F]+|[0-9]+) ; Numbers
 		|(""[^""\r\n]*"")          ; Strings
 		|\b(A_\w*|" Builtins ")\b  ; A_Builtins
 		|\b(" Flow ")\b            ; Flow
 		|\b(" Commands ")\b        ; Commands
-		|\b(" Functions ")\b       ; Functions
+		|\b(" Functions ")\b       ; Functions (builtin)
 		|\b(" Keynames ")\b        ; Keynames
 		|\b(" Keywords ")\b        ; Other keywords
+		|(([a-zA-Z_$]+)(?=\())     ; Functions
 	)"
-	
+
 	if (Settings.RTFHeader == "")
 		RTFHeader := GenRTFHeader(Settings)
 	else
 		RTFHeader := Settings.RTFHeader
-	
+
 	Pos := 1
 	while (FoundPos := RegExMatch(Code, Needle, Match, Pos))
 	{
 		RTF .= "\cf1 " EscapeRTF(SubStr(Code, Pos, FoundPos-Pos))
-		
+
 		; Flat block of if statements for performance
 		if (Match.Value(1) != "")
 			RTF .= "\cf2"
@@ -78,12 +79,14 @@ HighlightAHK(Settings, ByRef Code)
 			RTF .= "\cf12"
 		else if (Match.Value(12) != "")
 			RTF .= "\cf13"
+		else if (Match.Value(13) != "")
+			RTF .= "\cf11"
 		else
 			RTF .= "\cf1"
-		
+
 		RTF .= " " EscapeRTF(Match.Value())
 		Pos := FoundPos + Match.Len()
 	}
-	
+
 	return RTFHeader . RTF "\cf1 " EscapeRTF(SubStr(Code, Pos)) "\`n}"
 }

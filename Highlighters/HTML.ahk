@@ -2,7 +2,7 @@
 
 /*
 	Colors indices used:
-	
+
 	1: NOT USED
 	2: Multiline Comments
 	3: Attributes
@@ -19,7 +19,7 @@ HighlightHTML(Settings, ByRef Code, RTFHeader:="")
 	static Needle := "
 	( LTrim Join Comments
 		ODims)
-		(\<\!--.*--\>)        ; Multiline comments
+		(\<\!--.*?--\>)        ; Multiline comments
 		|(<(?:\/\s*)?)(\w+)   ; Tag
 		|([<>\/])             ; Punctuation
 		|(&\w+?;)             ; Entities
@@ -27,17 +27,17 @@ HighlightHTML(Settings, ByRef Code, RTFHeader:="")
 		|(""[^""]*""|'[^']*') ; String
 		|(\w+\s*)(=)          ; Attribute
 	)"
-	
+
 	if (Settings.RTFHeader == "")
 		RTFHeader := GenRTFHeader(Settings)
 	else
 		RTFHeader := Settings.RTFHeader
-	
+
 	Pos := 1
 	while (FoundPos := RegExMatch(Code, Needle, Match, Pos))
 	{
 		RTF .= "\cf1 " EscapeRTF(SubStr(Code, Pos, FoundPos-Pos))
-		
+
 		; Flat block of if statements for performance
 		if (Match.Value(1) != "")
 			RTF .= "\cf3 " EscapeRTF(Match.Value(1))
@@ -53,9 +53,9 @@ HighlightHTML(Settings, ByRef Code, RTFHeader:="")
 			RTF .= "\cf7 " EscapeRTF(Match.Value(7))
 		else if (Match.Value(8) != "")
 			RTF .= "\cf4 " EscapeRTF(Match.Value(8)) "\cf5 " Match.Value(9)
-		
+
 		Pos := FoundPos + Match.Len()
 	}
-	
+
 	return RTFHeader . RTF "\cf1 " EscapeRTF(SubStr(Code, Pos)) "\`n}"
 }
