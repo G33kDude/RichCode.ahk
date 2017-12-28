@@ -83,7 +83,7 @@ Settings :=
 
 ; Precompute and cache the RTF header for the highlighters
 ; (optional performance enhancement)
-GenRTFHeader(Settings)
+GenHighlighterCache(Settings)
 
 ; Add some controls
 Gui, Add, DropDownList, gChangeLang vLanguage, AHK||CSS|HTML|JS|Plain

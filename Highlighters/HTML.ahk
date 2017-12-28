@@ -29,7 +29,7 @@ HighlightHTML(Settings, ByRef Code, RTFHeader:="")
 	)"
 	
 	if !Settings.HasKey("RTFHeader")
-		GenRTFHeader(Settings)
+		GenHighlighterCache(Settings)
 	Map := Settings.Cache.ColorMap
 	
 	Pos := 1

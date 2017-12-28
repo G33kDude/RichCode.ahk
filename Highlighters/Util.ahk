@@ -1,4 +1,4 @@
-﻿GenRTFHeader(Settings)
+﻿GenHighlighterCache(Settings)
 {
 	if Settings.HasKey("Cache")
 		return
