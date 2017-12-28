@@ -34,41 +34,41 @@ HighlightCSS(Settings, ByRef Code, RTFHeader:="")
 		|([\w-]+\s*(?=:[^:]))             ; Properties
 	)"
 	
-	if (Settings.RTFHeader == "")
-		RTFHeader := GenRTFHeader(Settings)
-	else
-		RTFHeader := Settings.RTFHeader
+	if !Settings.HasKey("RTFHeader")
+		GenRTFHeader(Settings)
 	
 	Pos := 1
 	while (FoundPos := RegExMatch(Code, Needle, Match, Pos))
 	{
-		RTF .= "\cf1 " EscapeRTF(SubStr(Code, Pos, FoundPos-Pos))
+		RTF .= "\cf" Settings.ColorMap.Plain " "
+		RTF .= EscapeRTF(SubStr(Code, Pos, FoundPos-Pos))
 		
 		; Flat block of if statements for performance
 		if (Match.Value(1) != "")
-			RTF .= "\cf3"
+			RTF .= "\cf" Settings.ColorMap.Multiline
 		else if (Match.Value(2) != "")
-			RTF .= "\cf8"
+			RTF .= "\cf" Settings.ColorMap.Selectors
 		else if (Match.Value(3) != "")
-			RTF .= "\cf8"
+			RTF .= "\cf" Settings.ColorMap.Selectors
 		else if (Match.Value(4) != "")
-			RTF .= "\cf9"
+			RTF .= "\cf" Settings.ColorMap.Selectors
 		else if (Match.Value(5) != "")
-			RTF .= "\cf4"
+			RTF .= "\cf" Settings.ColorMap.ColorCodes
 		else if (Match.Value(6) != "")
-			RTF .= "\cf6"
+			RTF .= "\cf" Settings.ColorMap.Numbers
 		else if (Match.Value(7) != "")
-			RTF .= "\cf5"
+			RTF .= "\cf" Settings.ColorMap.Punctuation
 		else if (Match.Value(8) != "")
-			RTF .= "\cf7"
+			RTF .= "\cf" Settings.ColorMap.Strings
 		else if (Match.Value(9) != "")
-			RTF .= "\cf10"
+			RTF .= "\cf" Settings.ColorMap.Properties
 		else
-			RTF .= "\cf1"
+			RTF .= "\cf" Settings.ColorMap.Plain
 		
 		RTF .= " " EscapeRTF(Match.Value())
 		Pos := FoundPos + Match.Len()
 	}
 	
-	return RTFHeader . RTF "\cf1 " EscapeRTF(SubStr(Code, Pos)) "\`n}"
+	return Settings.RTFHeader . RTF
+	. "\cf" Settings.ColorMap.Plain " " EscapeRTF(SubStr(Code, Pos)) "\`n}"
 }

@@ -1,22 +1,5 @@
 ﻿#Include %A_LineFile%\..\Util.ahk
 
-/*
-	Colors indices used:
-	
-	1:  Comments
-	2:  Multiline comments
-	3:  Directives
-	4:  Punctuation
-	5:  Numbers
-	6:  Strings
-	7:  A_Builtins
-	8:  Flow
-	9:  Commands
-	10: Functions
-	11: Key names
-	12: Other keywords
-*/
-
 HighlightAHK(Settings, ByRef Code)
 {
 	static Flow := "break|byref|catch|class|continue|else|exit|exitapp|finally|for|global|gosub|goto|if|ifequal|ifexist|ifgreater|ifgreaterorequal|ifinstring|ifless|iflessorequal|ifmsgbox|ifnotequal|ifnotexist|ifnotinstring|ifwinactive|ifwinexist|ifwinnotactive|ifwinnotexist|local|loop|onexit|pause|return|settimer|sleep|static|suspend|throw|try|until|var|while"
@@ -44,49 +27,49 @@ HighlightAHK(Settings, ByRef Code)
 		|(([a-zA-Z_$]+)(?=\())     ; Functions
 	)"
 	
-	if (Settings.RTFHeader == "")
-		RTFHeader := GenRTFHeader(Settings)
-	else
-		RTFHeader := Settings.RTFHeader
+	if !Settings.HasKey("RTFHeader")
+		GenRTFHeader(Settings)
 	
 	Pos := 1
 	while (FoundPos := RegExMatch(Code, Needle, Match, Pos))
 	{
-		RTF .= "\cf1 " EscapeRTF(SubStr(Code, Pos, FoundPos-Pos))
+		RTF .= "\cf" Settings.ColorMap.Plain " "
+		RTF .= EscapeRTF(SubStr(Code, Pos, FoundPos-Pos))
 		
 		; Flat block of if statements for performance
 		if (Match.Value(1) != "")
-			RTF .= "\cf2"
+			RTF .= "\cf" Settings.ColorMap.Comments
 		else if (Match.Value(2) != "")
-			RTF .= "\cf3"
+			RTF .= "\cf" Settings.ColorMap.Multiline
 		else if (Match.Value(3) != "")
-			RTF .= "\cf4"
+			RTF .= "\cf" Settings.ColorMap.Directives
 		else if (Match.Value(4) != "")
-			RTF .= "\cf5"
+			RTF .= "\cf" Settings.ColorMap.Punctuation
 		else if (Match.Value(5) != "")
-			RTF .= "\cf6"
+			RTF .= "\cf" Settings.ColorMap.Numbers
 		else if (Match.Value(6) != "")
-			RTF .= "\cf7"
+			RTF .= "\cf" Settings.ColorMap.Strings
 		else if (Match.Value(7) != "")
-			RTF .= "\cf8"
+			RTF .= "\cf" Settings.ColorMap.A_Builtins
 		else if (Match.Value(8) != "")
-			RTF .= "\cf9"
+			RTF .= "\cf" Settings.ColorMap.Flow
 		else if (Match.Value(9) != "")
-			RTF .= "\cf10"
+			RTF .= "\cf" Settings.ColorMap.Commands
 		else if (Match.Value(10) != "")
-			RTF .= "\cf11"
+			RTF .= "\cf" Settings.ColorMap.Functions
 		else if (Match.Value(11) != "")
-			RTF .= "\cf12"
+			RTF .= "\cf" Settings.ColorMap.Keynames
 		else if (Match.Value(12) != "")
-			RTF .= "\cf13"
+			RTF .= "\cf" Settings.ColorMap.Keywords
 		else if (Match.Value(13) != "")
-			RTF .= "\cf11"
+			RTF .= "\cf" Settings.ColorMap.Functions
 		else
-			RTF .= "\cf1"
+			RTF .= "\cf" Settings.ColorMap.Plain
 		
 		RTF .= " " EscapeRTF(Match.Value())
 		Pos := FoundPos + Match.Len()
 	}
 	
-	return RTFHeader . RTF "\cf1 " EscapeRTF(SubStr(Code, Pos)) "\`n}"
+	return Settings.RTFHeader . RTF
+	. "\cf" Settings.ColorMap.Plain " " EscapeRTF(SubStr(Code, Pos)) "\`n}"
 }

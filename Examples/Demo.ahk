@@ -11,7 +11,7 @@ SetWorkingDir, %A_ScriptDir%
 
 ; Table of supported languages and sample codes for the demo
 Codes :=
-( LTrim Join
+( LTrim Join Comments
 {
 	"AHK": {
 		"Highlighter": "HighlightAHK",
@@ -48,27 +48,42 @@ Settings :=
 	
 	"UseHighlighter": True,
 	"HighlightDelay": 200,
-	"Colors": [
-		; RRGGBB  ;    ; AHK                ; HTML
-		0x7F9F7F, ;  1 ; Comments           ; NOT USED
-		0x7F9F7F, ;  2 ; Multiline comments ; Multiline Comments
-		0x7CC8CF, ;  3 ; Directives         ; Attributes
-		0x97C0EB, ;  4 ; Punctuation        ; Punctuation
-		0xF79B57, ;  5 ; Numbers            ; Numbers
-		0xCC9893, ;  6 ; Strings            ; Strings
-		0xF79B57, ;  7 ; A_Builtins         ; &Entities;
-		0xE4EDED, ;  8 ; Flow               ; NOT USED
-		0xCDBFA3, ;  9 ; Commands           ; Tags
-		0x7CC8CF, ; 10 ; Functions          ; NOT USED
-		0xCB8DD9, ; 11 ; Key names          ; NOT USED
-		0xE4EDED  ; 12 ; Other keywords     ; NOT USED
-	]
+	"Colors": {
+		"Comments":     0x7F9F7F,
+		"Functions":    0x7CC8CF,
+		"Keywords":     0xE4EDED,
+		"Multiline":    0x7F9F7F,
+		"Numbers":      0xF79B57,
+		"Punctuation":  0x97C0EB,
+		"Strings":      0xCC9893,
+		
+		; AHK
+		"A_Builtins":   0xF79B57,
+		"Commands":     0xCDBFA3,
+		"Directives":   0x7CC8CF,
+		"Flow":         0xE4EDED,
+		"KeyNames":     0xCB8DD9,
+		
+		; CSS
+		"ColorCodes":   0x7CC8CF,
+		"Properties":   0xCDBFA3,
+		"Selectors":    0xE4EDED,
+		
+		; HTML
+		"Attributes":   0x7CC8CF,
+		"Entities":     0xF79B57,
+		"Tags":         0xCDBFA3,
+		
+		; JS
+		"Constants":    0xF79B57,
+		"Declarations": 0xCDBFA3
+	}
 }
 )
 
 ; Precompute and cache the RTF header for the highlighters
 ; (optional performance enhancement)
-Settings.RTFHeader := GenRTFHeader(Settings)
+GenRTFHeader(Settings)
 
 ; Add some controls
 Gui, Add, DropDownList, gChangeLang vLanguage, AHK||CSS|HTML|JS|Plain

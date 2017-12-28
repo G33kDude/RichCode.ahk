@@ -2,9 +2,16 @@
 {
 	RTF := "{\urtf"
 	
+	if !Settings.Colors.HasKey("Plain")
+		Settings.Colors.Plain := Settings.FGColor
+	
+	if !Settings.ColorMap
+		for Name, Color in Settings.Colors
+			Settings["ColorMap", Name] := A_Index
+	
 	; Color Table
 	RTF .= "{\colortbl;"
-	for each, Color in [Settings.FGColor, Settings.Colors*]
+	for Name, Color in Settings.Colors
 	{
 		RTF .= "\red"   Color>>16 & 0xFF
 		RTF .= "\green" Color>>8  & 0xFF
@@ -25,7 +32,7 @@
 	
 	RTF .= "\deftab" GetCharWidthTwips(Settings.Font) * Settings.TabSize ; Tab size (twips)
 	
-	return RTF
+	Settings.RTFHeader := RTF
 }
 
 GetCharWidthTwips(Font)
