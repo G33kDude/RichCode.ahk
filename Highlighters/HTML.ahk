@@ -28,8 +28,7 @@ HighlightHTML(Settings, ByRef Code, RTFHeader:="")
 		|(\w+\s*)(=)          ; Attributes
 	)"
 	
-	if !Settings.HasKey("RTFHeader")
-		GenHighlighterCache(Settings)
+	GenHighlighterCache(Settings)
 	Map := Settings.Cache.ColorMap
 	
 	Pos := 1

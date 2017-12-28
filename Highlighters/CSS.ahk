@@ -34,8 +34,7 @@ HighlightCSS(Settings, ByRef Code, RTFHeader:="")
 		|([\w-]+\s*(?=:[^:]))             ; Properties
 	)"
 	
-	if !Settings.HasKey("RTFHeader")
-		GenHighlighterCache(Settings)
+	GenHighlighterCache(Settings)
 	Map := Settings.Cache.ColorMap
 	
 	Pos := 1

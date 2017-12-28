@@ -27,8 +27,7 @@ HighlightAHK(Settings, ByRef Code)
 		|(([a-zA-Z_$]+)(?=\())     ; Functions
 	)"
 	
-	if !Settings.HasKey("RTFHeader")
-		GenHighlighterCache(Settings)
+	GenHighlighterCache(Settings)
 	Map := Settings.Cache.ColorMap
 	
 	Pos := 1
