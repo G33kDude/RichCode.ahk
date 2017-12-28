@@ -82,10 +82,6 @@ Settings :=
 }
 )
 
-; Precompute and cache the RTF header for the highlighters
-; (optional performance enhancement)
-GenHighlighterCache(Settings)
-
 ; Add some controls
 Gui, Add, DropDownList, gChangeLang vLanguage, AHK||CSS|HTML|JS|Plain
 Gui, Add, Button, ym gBlockComment, Block &Comment
