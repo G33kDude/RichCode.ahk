@@ -5,7 +5,7 @@
 	
 	1:  Comments
 	2:  Multiline comments
-	3:  NOT USED
+	3:  Functions
 	4:  Punctuation
 	5:  Numbers
 	6:  Strings
@@ -38,6 +38,7 @@ HighlightJS(Settings, ByRef Code)
 		|\b(" Keywords ")\b        ; Keywords
 		|\b(" Declarations ")\b    ; Declarations
 		|\b(" Builtins ")\b        ; Builtins
+		|(([a-zA-Z_$]+)(?=\())     ; Functions
 	)"
 	
 	if (Settings.RTFHeader == "")
@@ -69,6 +70,8 @@ HighlightJS(Settings, ByRef Code)
 			RTF .= "\cf10"
 		else if (Match.Value(9) != "")
 			RTF .= "\cf13"
+		else if (Match.Value(10) != "")
+			RTF .= "\cf4"
 		else
 			RTF .= "\cf1"
 		
