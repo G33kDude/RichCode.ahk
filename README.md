@@ -38,8 +38,8 @@ class RichCode({"TabSize": 4     ; Width of a tab in characters
 	; RichCode class. As such, the RGB ordering is by convention only.
 	; You can add as many colors to this array as you want.
 	, "Colors"
-	: [0xRRGGBB
-		, 0xRRGGBB
-		, 0xRRGGBB,
-		, 0xRRGGBB]})
+	: {"Comments": 0xRRGGBB
+		, "Functions": 0xRRGGBB
+		, "Numbers": 0xRRGGBB,
+		, "Strings": 0xRRGGBB}})
 ```
