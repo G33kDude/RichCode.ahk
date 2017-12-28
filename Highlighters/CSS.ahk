@@ -20,6 +20,9 @@ HighlightCSS(Settings, ByRef Code, RTFHeader:="")
 	( LTrim Join Comments
 		ODims)
 		(\/\*.*?\*\/)                     ; Multiline comments
+		|(\.[a-zA-Z_\-0-9]+)(?=[^}]*\{)   ; Classes
+		|(\#[a-zA-Z_\-0-9]+)(?=[^}]*\{)   ; IDs
+		|([a-zA-Z]+)(?=[^}]*\{)           ; Normal elements
 		|(#[0-9a-fA-F]{3,8}\b)            ; Color code
 		|\b((?:0x[0-9a-fA-F]+|[0-9]+)     ; Numbers
 			(?:\s*(?:em|ex|%|px|cm
@@ -45,14 +48,20 @@ HighlightCSS(Settings, ByRef Code, RTFHeader:="")
 		if (Match.Value(1) != "")
 			RTF .= "\cf3"
 		else if (Match.Value(2) != "")
-			RTF .= "\cf4"
+			RTF .= "\cf8"
 		else if (Match.Value(3) != "")
-			RTF .= "\cf6"
+			RTF .= "\cf8"
 		else if (Match.Value(4) != "")
-			RTF .= "\cf5"
+			RTF .= "\cf9"
 		else if (Match.Value(5) != "")
-			RTF .= "\cf7"
+			RTF .= "\cf4"
 		else if (Match.Value(6) != "")
+			RTF .= "\cf6"
+		else if (Match.Value(7) != "")
+			RTF .= "\cf5"
+		else if (Match.Value(8) != "")
+			RTF .= "\cf7"
+		else if (Match.Value(9) != "")
 			RTF .= "\cf10"
 		else
 			RTF .= "\cf1"
