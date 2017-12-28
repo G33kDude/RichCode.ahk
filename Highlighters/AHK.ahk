@@ -38,9 +38,10 @@ HighlightAHK(Settings, ByRef Code)
 		|\b(A_\w*|" Builtins ")\b  ; A_Builtins
 		|\b(" Flow ")\b            ; Flow
 		|\b(" Commands ")\b        ; Commands
-		|\b(" Functions ")\b       ; Functions
+		|\b(" Functions ")\b       ; Functions (builtin)
 		|\b(" Keynames ")\b        ; Keynames
 		|\b(" Keywords ")\b        ; Other keywords
+		|(([a-zA-Z_$]+)(?=\())     ; Functions
 	)"
 	
 	if (Settings.RTFHeader == "")
@@ -78,6 +79,8 @@ HighlightAHK(Settings, ByRef Code)
 			RTF .= "\cf12"
 		else if (Match.Value(12) != "")
 			RTF .= "\cf13"
+		else if (Match.Value(13) != "")
+			RTF .= "\cf11"
 		else
 			RTF .= "\cf1"
 		
