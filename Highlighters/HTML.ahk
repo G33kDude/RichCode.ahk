@@ -19,7 +19,7 @@ HighlightHTML(Settings, ByRef Code, RTFHeader:="")
 	static Needle := "
 	( LTrim Join Comments
 		ODims)
-		(\<\!--.*--\>)        ; Multiline comments
+		(\<\!--.*?--\>)       ; Multiline comments
 		|(<(?:\/\s*)?)(\w+)   ; Tag
 		|([<>\/])             ; Punctuation
 		|(&\w+?;)             ; Entities
