@@ -22,7 +22,7 @@ HighlightHTML(Settings, ByRef Code, RTFHeader:="")
 		(\<\!--.*?--\>)       ; Multiline comments
 		|(<(?:\/\s*)?)(\w+)   ; Tag
 		|([<>\/])             ; Punctuation
-		|(&\w+?;)             ; Entities
+		|(&[#\w]+?;)          ; Entities
 		|((?<=[>;])[^<>&]+)   ; Text
 		|(""[^""]*""|'[^']*') ; String
 		|(\w+\s*)(=)          ; Attribute
