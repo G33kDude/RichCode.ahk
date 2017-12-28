@@ -29,47 +29,48 @@ HighlightAHK(Settings, ByRef Code)
 	
 	if !Settings.HasKey("RTFHeader")
 		GenRTFHeader(Settings)
+	Map := Settings.Cache.ColorMap
 	
 	Pos := 1
 	while (FoundPos := RegExMatch(Code, Needle, Match, Pos))
 	{
-		RTF .= "\cf" Settings.ColorMap.Plain " "
+		RTF .= "\cf" Map.Plain " "
 		RTF .= EscapeRTF(SubStr(Code, Pos, FoundPos-Pos))
 		
 		; Flat block of if statements for performance
 		if (Match.Value(1) != "")
-			RTF .= "\cf" Settings.ColorMap.Comments
+			RTF .= "\cf" Map.Comments
 		else if (Match.Value(2) != "")
-			RTF .= "\cf" Settings.ColorMap.Multiline
+			RTF .= "\cf" Map.Multiline
 		else if (Match.Value(3) != "")
-			RTF .= "\cf" Settings.ColorMap.Directives
+			RTF .= "\cf" Map.Directives
 		else if (Match.Value(4) != "")
-			RTF .= "\cf" Settings.ColorMap.Punctuation
+			RTF .= "\cf" Map.Punctuation
 		else if (Match.Value(5) != "")
-			RTF .= "\cf" Settings.ColorMap.Numbers
+			RTF .= "\cf" Map.Numbers
 		else if (Match.Value(6) != "")
-			RTF .= "\cf" Settings.ColorMap.Strings
+			RTF .= "\cf" Map.Strings
 		else if (Match.Value(7) != "")
-			RTF .= "\cf" Settings.ColorMap.A_Builtins
+			RTF .= "\cf" Map.A_Builtins
 		else if (Match.Value(8) != "")
-			RTF .= "\cf" Settings.ColorMap.Flow
+			RTF .= "\cf" Map.Flow
 		else if (Match.Value(9) != "")
-			RTF .= "\cf" Settings.ColorMap.Commands
+			RTF .= "\cf" Map.Commands
 		else if (Match.Value(10) != "")
-			RTF .= "\cf" Settings.ColorMap.Functions
+			RTF .= "\cf" Map.Functions
 		else if (Match.Value(11) != "")
-			RTF .= "\cf" Settings.ColorMap.Keynames
+			RTF .= "\cf" Map.Keynames
 		else if (Match.Value(12) != "")
-			RTF .= "\cf" Settings.ColorMap.Keywords
+			RTF .= "\cf" Map.Keywords
 		else if (Match.Value(13) != "")
-			RTF .= "\cf" Settings.ColorMap.Functions
+			RTF .= "\cf" Map.Functions
 		else
-			RTF .= "\cf" Settings.ColorMap.Plain
+			RTF .= "\cf" Map.Plain
 		
 		RTF .= " " EscapeRTF(Match.Value())
 		Pos := FoundPos + Match.Len()
 	}
 	
-	return Settings.RTFHeader . RTF
-	. "\cf" Settings.ColorMap.Plain " " EscapeRTF(SubStr(Code, Pos)) "\`n}"
+	return Settings.Cache.RTFHeader . RTF
+	. "\cf" Map.Plain " " EscapeRTF(SubStr(Code, Pos)) "\`n}"
 }

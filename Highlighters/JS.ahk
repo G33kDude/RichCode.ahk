@@ -26,41 +26,42 @@ HighlightJS(Settings, ByRef Code)
 	
 	if !Settings.HasKey("RTFHeader")
 		GenRTFHeader(Settings)
+	Map := Settings.Cache.ColorMap
 	
 	Pos := 1
 	while (FoundPos := RegExMatch(Code, Needle, Match, Pos))
 	{
-		RTF .= "\cf" Settings.ColorMap.Plain " "
+		RTF .= "\cf" Map.Plain " "
 		RTF .= EscapeRTF(SubStr(Code, Pos, FoundPos-Pos))
 		
 		; Flat block of if statements for performance
 		if (Match.Value(1) != "")
-			RTF .= "\cf" Settings.ColorMap.Comments
+			RTF .= "\cf" Map.Comments
 		else if (Match.Value(2) != "")
-			RTF .= "\cf" Settings.ColorMap.Multiline
+			RTF .= "\cf" Map.Multiline
 		else if (Match.Value(3) != "")
-			RTF .= "\cf" Settings.ColorMap.Punctuation
+			RTF .= "\cf" Map.Punctuation
 		else if (Match.Value(4) != "")
-			RTF .= "\cf" Settings.ColorMap.Numbers
+			RTF .= "\cf" Map.Numbers
 		else if (Match.Value(5) != "")
-			RTF .= "\cf" Settings.ColorMap.Strings
+			RTF .= "\cf" Map.Strings
 		else if (Match.Value(6) != "")
-			RTF .= "\cf" Settings.ColorMap.Constants
+			RTF .= "\cf" Map.Constants
 		else if (Match.Value(7) != "")
-			RTF .= "\cf" Settings.ColorMap.Keywords
+			RTF .= "\cf" Map.Keywords
 		else if (Match.Value(8) != "")
-			RTF .= "\cf" Settings.ColorMap.Declarations
+			RTF .= "\cf" Map.Declarations
 		else if (Match.Value(9) != "")
-			RTF .= "\cf" Settings.ColorMap.Builtins
+			RTF .= "\cf" Map.Builtins
 		else if (Match.Value(10) != "")
-			RTF .= "\cf" Settings.ColorMap.Functions
+			RTF .= "\cf" Map.Functions
 		else
-			RTF .= "\cf" Settings.ColorMap.Plain
+			RTF .= "\cf" Map.Plain
 		
 		RTF .= " " EscapeRTF(Match.Value())
 		Pos := FoundPos + Match.Len()
 	}
 	
-	return Settings.RTFHeader . RTF
-	. "\cf" Settings.ColorMap.Plain " " EscapeRTF(SubStr(Code, Pos)) "\`n}"
+	return Settings.Cache.RTFHeader . RTF
+	. "\cf" Map.Plain " " EscapeRTF(SubStr(Code, Pos)) "\`n}"
 }

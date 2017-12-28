@@ -1,17 +1,36 @@
 ﻿GenRTFHeader(Settings)
 {
+	if Settings.HasKey("Cache")
+		return
+	Cache := Settings.Cache := {}
+	
+	
+	; --- Process Colors ---
+	Cache.Colors := Settings.Colors.Clone()
+	
+	; Inherit from the Settings array's base
+	BaseSettings := Settings
+	while (BaseSettings := BaseSettings.Base)
+		for Name, Color in BaseSettings.Colors
+			if !Cache.Colors.HasKey(Name)
+				Cache.Colors[Name] := Color
+	
+	; Include the color of plain text
+	if !Cache.Colors.HasKey("Plain")
+		Cache.Colors.Plain := Settings.FGColor
+	
+	; Create a Name->Index map of the colors
+	Cache.ColorMap := {}
+	for Name, Color in Cache.Colors
+		Cache.ColorMap[Name] := A_Index
+	
+	
+	; --- Generate the RTF headers ---
 	RTF := "{\urtf"
-	
-	if !Settings.Colors.HasKey("Plain")
-		Settings.Colors.Plain := Settings.FGColor
-	
-	if !Settings.ColorMap
-		for Name, Color in Settings.Colors
-			Settings["ColorMap", Name] := A_Index
 	
 	; Color Table
 	RTF .= "{\colortbl;"
-	for Name, Color in Settings.Colors
+	for Name, Color in Cache.Colors
 	{
 		RTF .= "\red"   Color>>16 & 0xFF
 		RTF .= "\green" Color>>8  & 0xFF
@@ -19,9 +38,9 @@
 	}
 	RTF .= "}"
 	
+	; Font Table
 	if Settings.Font
 	{
-		; Font Table
 		FontTable .= "{\fonttbl{\f0\fmodern\fcharset0 "
 		FontTable .= Settings.Font.Typeface
 		FontTable .= ";}}"
@@ -30,9 +49,10 @@
 			RTF .= "\b"
 	}
 	
-	RTF .= "\deftab" GetCharWidthTwips(Settings.Font) * Settings.TabSize ; Tab size (twips)
+	; Tab size (twips)
+	RTF .= "\deftab" GetCharWidthTwips(Settings.Font) * Settings.TabSize
 	
-	Settings.RTFHeader := RTF
+	Cache.RTFHeader := RTF
 }
 
 GetCharWidthTwips(Font)

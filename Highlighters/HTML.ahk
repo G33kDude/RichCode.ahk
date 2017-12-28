@@ -30,38 +30,39 @@ HighlightHTML(Settings, ByRef Code, RTFHeader:="")
 	
 	if !Settings.HasKey("RTFHeader")
 		GenRTFHeader(Settings)
+	Map := Settings.Cache.ColorMap
 	
 	Pos := 1
 	while (FoundPos := RegExMatch(Code, Needle, Match, Pos))
 	{
-		RTF .= "\cf" Settings.ColorMap.Plain " "
+		RTF .= "\cf" Map.Plain " "
 		RTF .= EscapeRTF(SubStr(Code, Pos, FoundPos-Pos))
 		
 		; Flat block of if statements for performance
 		if (Match.Value(1) != "")
-			RTF .= "\cf" Settings.ColorMap.Multiline " " EscapeRTF(Match.Value(1))
+			RTF .= "\cf" Map.Multiline " " EscapeRTF(Match.Value(1))
 		else if (Match.Value(2) != "")
 		{
-			RTF .= "\cf" Settings.ColorMap.Punctuation " " EscapeRTF(Match.Value(2))
-			RTF .= "\cf" Settings.ColorMap.Tags " " EscapeRTF(Match.Value(3))
+			RTF .= "\cf" Map.Punctuation " " EscapeRTF(Match.Value(2))
+			RTF .= "\cf" Map.Tags " " EscapeRTF(Match.Value(3))
 		}
 		else if (Match.Value(4) != "")
-			RTF .= "\cf" Settings.ColorMap.Punctuation " " Match.Value(4)
+			RTF .= "\cf" Map.Punctuation " " Match.Value(4)
 		else if (Match.Value(5) != "")
-			RTF .= "\cf" Settings.ColorMap.Entities " " EscapeRTF(Match.Value(5))
+			RTF .= "\cf" Map.Entities " " EscapeRTF(Match.Value(5))
 		else if (Match.Value(6) != "")
-			RTF .= "\cf" Settings.ColorMap.Plain " " EscapeRTF(Match.Value(6))
+			RTF .= "\cf" Map.Plain " " EscapeRTF(Match.Value(6))
 		else if (Match.Value(7) != "")
-			RTF .= "\cf" Settings.ColorMap.Strings " " EscapeRTF(Match.Value(7))
+			RTF .= "\cf" Map.Strings " " EscapeRTF(Match.Value(7))
 		else if (Match.Value(8) != "")
 		{
-			RTF .= "\cf" Settings.ColorMap.Attributes " " EscapeRTF(Match.Value(8))
-			RTF .= "\cf" Settings.ColorMap.Punctuation " " Match.Value(9)
+			RTF .= "\cf" Map.Attributes " " EscapeRTF(Match.Value(8))
+			RTF .= "\cf" Map.Punctuation " " Match.Value(9)
 		}
 		
 		Pos := FoundPos + Match.Len()
 	}
 	
-	return Settings.RTFHeader . RTF
-	. "\cf" Settings.ColorMap.Plain " " EscapeRTF(SubStr(Code, Pos)) "\`n}"
+	return Settings.Cache.RTFHeader . RTF
+	. "\cf" Map.Plain " " EscapeRTF(SubStr(Code, Pos)) "\`n}"
 }
