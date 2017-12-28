@@ -23,14 +23,14 @@ HighlightCSS(Settings, ByRef Code, RTFHeader:="")
 		|(\.[a-zA-Z_\-0-9]+)(?=[^}]*\{)   ; Classes
 		|(\#[a-zA-Z_\-0-9]+)(?=[^}]*\{)   ; IDs
 		|([a-zA-Z]+)(?=[^}]*\{)           ; Normal elements
-		|(#[0-9a-fA-F]{3,8}\b)            ; Color code
+		|(#[0-9a-fA-F]{3,8}\b)            ; Color codes
 		|\b((?:0x[0-9a-fA-F]+|[0-9]+)     ; Numbers
 			(?:\s*(?:em|ex|%|px|cm
 			|mm|in|pt|pc|ch|rem|vh
 			|vw|vmin|vmax|s|deg))?)
 		|([+*!~&\/\\<>^|=?:@;
 			,().```%{}\[\]\-])            ; Punctuation
-		|(""[^""]*""|'[^']*')             ; String
+		|(""[^""]*""|'[^']*')             ; Strings
 		|([\w-]+\s*(?=:[^:]))             ; Properties
 	)"
 	

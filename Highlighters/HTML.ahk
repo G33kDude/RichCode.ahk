@@ -20,12 +20,12 @@ HighlightHTML(Settings, ByRef Code, RTFHeader:="")
 	( LTrim Join Comments
 		ODims)
 		(\<\!--.*?--\>)       ; Multiline comments
-		|(<(?:\/\s*)?)(\w+)   ; Tag
+		|(<(?:\/\s*)?)(\w+)   ; Tags
 		|([<>\/])             ; Punctuation
 		|(&[#\w]+?;)          ; Entities
 		|((?<=[>;])[^<>&]+)   ; Text
-		|(""[^""]*""|'[^']*') ; String
-		|(\w+\s*)(=)          ; Attribute
+		|(""[^""]*""|'[^']*') ; Strings
+		|(\w+\s*)(=)          ; Attributes
 	)"
 	
 	if !Settings.HasKey("RTFHeader")
