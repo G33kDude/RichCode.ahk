@@ -45,6 +45,7 @@ Settings :=
 	"FGColor": 0xEDEDCD,
 	"BGColor": 0x3F3F3F,
 	"Font": {"Typeface": "Consolas", "Size": 11},
+	"WordWrap": False,
 	
 	"UseHighlighter": True,
 	"HighlightDelay": 200,

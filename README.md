@@ -19,6 +19,7 @@ class RichCode({"TabSize": 4     ; Width of a tab in characters
 	: {"Typeface": "Courier New" ; Name of the typeface
 		, "Size": 12             ; Font size in points
 		, "Bold": False}         ; Bold weight (True/False)
+	, "WordWrap": False          ; Whether to enable WordWrap
 	
 	
 	; Whether to use the highlighter, or leave it as plain text
