@@ -88,7 +88,7 @@ Gui, Add, Button, ym gBlockComment, Block &Comment
 Gui, Add, Button, ym gBlockUncomment, Block &Uncomment
 
 ; Add the RichCode
-RC := new RichCode(Settings.Clone(), "xm w640 h470")
+RC := new RichCode(Settings, "xm w640 h470")
 GuiControl, Focus, % RC.hWnd
 
 ; Set its starting contents
