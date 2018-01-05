@@ -36,6 +36,8 @@ class RichCode
 {
 	static Msftedit := DllCall("LoadLibrary", "Str", "Msftedit.dll")
 	static IID_ITextDocument := "{8CC497C0-A1DF-11CE-8098-00AA0047BE5D}"
+	static MenuItems := ["Cut", "Copy", "Paste", "Delete", "", "Select All", ""
+		, "UPPERCASE", "lowercase", "TitleCase"]
 	
 	_Frozen := False
 	
@@ -214,9 +216,16 @@ class RichCode
 		; Use a pointer to prevent reference loop
 		this.OnMessageBound := this.OnMessage.Bind(&this)
 		OnMessage(0x100, this.OnMessageBound) ; WM_KEYDOWN
+		OnMessage(0x205, this.OnMessageBound) ; WM_RBUTTONUP
 		
 		; Bind the highlighter
 		this.HighlightBound := this.Highlight.Bind(&this)
+		
+		; Create the right click menu
+		this.MenuName := this.__Class . &this
+		RCMBound := this.RightClickMenu.Bind(&this)
+		for Index, Entry in this.MenuItems
+			Menu, % this.MenuName, Add, %Entry%, %RCMBound%
 		
 		; Get the ITextDocument object
 		VarSetCapacity(pIRichEditOle, A_PtrSize, 0)
@@ -227,6 +236,29 @@ class RichCode
 		this.ITextDocument := ComObject(9, this.pITextDocument, 1), ObjAddRef(this.pITextDocument)
 	}
 	
+	RightClickMenu(ItemName, ItemPos, MenuName)
+	{
+		if !IsObject(this)
+			this := Object(this)
+		
+		if (ItemName == "Cut")
+			Clipboard := this.SelectedText, this.SelectedText := ""
+		else if (ItemName == "Copy")
+			Clipboard := this.SelectedText
+		else if (ItemName == "Paste")
+			this.SelectedText := Clipboard
+		else if (ItemName == "Delete")
+			this.SelectedText := ""
+		else if (ItemName == "Select All")
+			this.Selection := [0, -1]
+		else if (ItemName == "UPPERCASE")
+			this.SelectedText := Format("{:U}", this.SelectedText)
+		else if (ItemName == "lowercase")
+			this.SelectedText := Format("{:L}", this.SelectedText)
+		else if (ItemName == "TitleCase")
+			this.SelectedText := Format("{:T}", this.SelectedText)
+	}
+	
 	__Delete()
 	{
 		; Release the ITextDocument object
@@ -235,6 +267,10 @@ class RichCode
 		
 		; Release the OnMessage handlers
 		OnMessage(0x100, this.OnMessageBound, 0) ; WM_KEYDOWN
+		OnMessage(0x205, this.OnMessageBound, 0) ; WM_RBUTTONUP
+		
+		; Destroy the right click menu
+		Menu, % this.MenuName, Delete
 		
 		HighlightBound := this.HighlightBound
 		SetTimer, %HighlightBound%, Delete
@@ -275,6 +311,11 @@ class RichCode
 				this.Selection[1] := this.Selection[2] ; Place cursor after
 				return False
 			}
+		}
+		else if (Msg == 0x205) ; WM_KEYDOWN
+		{
+			Menu, % this.MenuName, Show
+			return False
 		}
 	}
 	
