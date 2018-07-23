@@ -312,7 +312,7 @@ class RichCode
 				return False
 			}
 		}
-		else if (Msg == 0x205) ; WM_KEYDOWN
+		else if (Msg == 0x205) ; WM_RBUTTONUP
 		{
 			Menu, % this.MenuName, Show
 			return False
