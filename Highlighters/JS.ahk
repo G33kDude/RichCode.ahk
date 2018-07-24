@@ -62,5 +62,5 @@ HighlightJS(Settings, ByRef Code)
 	}
 	
 	return Settings.Cache.RTFHeader . RTF
-	. "\cf" Map.Plain " " EscapeRTF(SubStr(Code, Pos)) "}"
+	. "\cf" Map.Plain " " EscapeRTF(SubStr(Code, Pos)) "\`n}"
 }
