@@ -368,14 +368,13 @@ class RichCode
 		VarSetCapacity(POINT,     8, 0) ; Scroll Pos
 		VarSetCapacity(CHARRANGE, 8, 0) ; Selection
 		VarSetCapacity(SETTEXTEX, 8, 0) ; SetText Settings
-		NumPut(3, SETTEXTEX, 0, "UInt") ; flags = ST_KEEPUNDO | ST_SELECTION
+		NumPut(1, SETTEXTEX, 0, "UInt") ; flags = ST_KEEPUNDO
 		
 		; Save the scroll and cursor positions, update the text,
 		; then restore the scroll and cursor positions
 		MODIFY := this.SendMsg(0xB8, 0, 0)    ; EM_GETMODIFY
 		this.SendMsg(0x4DD, 0, &POINT)        ; EM_GETSCROLLPOS
 		this.SendMsg(0x434, 0, &CHARRANGE)    ; EM_EXGETSEL
-		this.Selection := [0, -1]             ; Select All
 		this.SendMsg(0x461, &SETTEXTEX, &Buf) ; EM_SETTEXTEX
 		this.SendMsg(0x437, 0, &CHARRANGE)    ; EM_EXSETSEL
 		this.SendMsg(0x4DE, 0, &POINT)        ; EM_SETSCROLLPOS
