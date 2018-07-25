@@ -365,6 +365,7 @@ class RichCode
 		StrPut(RTF, &Buf, "UTF-8")
 		
 		; Set up the necessary structs
+		VarSetCapacity(ZOOM,      8, 0) ; Zoom Level
 		VarSetCapacity(POINT,     8, 0) ; Scroll Pos
 		VarSetCapacity(CHARRANGE, 8, 0) ; Selection
 		VarSetCapacity(SETTEXTEX, 8, 0) ; SetText Settings
@@ -373,11 +374,14 @@ class RichCode
 		; Save the scroll and cursor positions, update the text,
 		; then restore the scroll and cursor positions
 		MODIFY := this.SendMsg(0xB8, 0, 0)    ; EM_GETMODIFY
+		this.SendMsg(0x4E0, &ZOOM, &ZOOM+4)   ; EM_GETZOOM
 		this.SendMsg(0x4DD, 0, &POINT)        ; EM_GETSCROLLPOS
 		this.SendMsg(0x434, 0, &CHARRANGE)    ; EM_EXGETSEL
 		this.SendMsg(0x461, &SETTEXTEX, &Buf) ; EM_SETTEXTEX
 		this.SendMsg(0x437, 0, &CHARRANGE)    ; EM_EXSETSEL
 		this.SendMsg(0x4DE, 0, &POINT)        ; EM_SETSCROLLPOS
+		this.SendMsg(0x4E1, NumGet(ZOOM, "UInt")
+			, NumGet(ZOOM, 4, "UInt"))        ; EM_SETZOOM
 		this.SendMsg(0xB9, MODIFY, 0)         ; EM_SETMODIFY
 		
 		; Restore previous settings
