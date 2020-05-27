@@ -14,7 +14,7 @@
 	9: Tags
 */
 
-HighlightHTML(Settings, ByRef Code, RTFHeader:="")
+HighlightHTML(Settings, ByRef Code, Bare:=False)
 {
 	static Needle := "
 	( LTrim Join Comments
@@ -61,6 +61,9 @@ HighlightHTML(Settings, ByRef Code, RTFHeader:="")
 		
 		Pos := FoundPos + Match.Len()
 	}
+	
+	if Bare
+		return RTF . "\cf" Map.Plain " " EscapeRTF(SubStr(Code, Pos))
 	
 	return Settings.Cache.RTFHeader . RTF
 	. "\cf" Map.Plain " " EscapeRTF(SubStr(Code, Pos)) "\`n}"

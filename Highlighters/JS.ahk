@@ -1,6 +1,6 @@
 ﻿#Include %A_LineFile%\..\Util.ahk
 
-HighlightJS(Settings, ByRef Code)
+HighlightJS(Settings, ByRef Code, Bare:=False)
 {
 	; Thank you to the Rouge project for compiling these keyword lists
 	; https://github.com/jneen/rouge/blob/master/lib/rouge/lexers/javascript.rb
@@ -60,6 +60,9 @@ HighlightJS(Settings, ByRef Code)
 		RTF .= " " EscapeRTF(Match.Value())
 		Pos := FoundPos + Match.Len()
 	}
+	
+	if Bare
+		return RTF . "\cf" Map.Plain " " EscapeRTF(SubStr(Code, Pos))
 	
 	return Settings.Cache.RTFHeader . RTF
 	. "\cf" Map.Plain " " EscapeRTF(SubStr(Code, Pos)) "\`n}"

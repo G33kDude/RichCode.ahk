@@ -1,6 +1,9 @@
 ﻿#Include %A_LineFile%\..\Util.ahk
+#Include %A_LineFile%\..\CSS.ahk
+#Include %A_LineFile%\..\HTML.ahk
+#Include %A_LineFile%\..\JS.ahk
 
-HighlightAHK(Settings, ByRef Code)
+HighlightAHK(Settings, ByRef Code, Bare:=False)
 {
 	static Flow := "break|byref|catch|class|continue|else|exit|exitapp|finally|for|global|gosub|goto|if|ifequal|ifexist|ifgreater|ifgreaterorequal|ifinstring|ifless|iflessorequal|ifmsgbox|ifnotequal|ifnotexist|ifnotinstring|ifwinactive|ifwinexist|ifwinnotactive|ifwinnotexist|local|loop|onexit|pause|return|settimer|sleep|static|suspend|throw|try|until|var|while"
 	, Commands := "autotrim|blockinput|clipwait|control|controlclick|controlfocus|controlget|controlgetfocus|controlgetpos|controlgettext|controlmove|controlsend|controlsendraw|controlsettext|coordmode|critical|detecthiddentext|detecthiddenwindows|drive|driveget|drivespacefree|edit|envadd|envdiv|envget|envmult|envset|envsub|envupdate|fileappend|filecopy|filecopydir|filecreatedir|filecreateshortcut|filedelete|fileencoding|filegetattrib|filegetshortcut|filegetsize|filegettime|filegetversion|fileinstall|filemove|filemovedir|fileread|filereadline|filerecycle|filerecycleempty|fileremovedir|fileselectfile|fileselectfolder|filesetattrib|filesettime|formattime|getkeystate|groupactivate|groupadd|groupclose|groupdeactivate|gui|guicontrol|guicontrolget|hotkey|imagesearch|inidelete|iniread|iniwrite|input|inputbox|keyhistory|keywait|listhotkeys|listlines|listvars|menu|mouseclick|mouseclickdrag|mousegetpos|mousemove|msgbox|outputdebug|pixelgetcolor|pixelsearch|postmessage|process|progress|random|regdelete|regread|regwrite|reload|run|runas|runwait|send|sendevent|sendinput|sendlevel|sendmessage|sendmode|sendplay|sendraw|setbatchlines|setcapslockstate|setcontroldelay|setdefaultmousespeed|setenv|setformat|setkeydelay|setmousedelay|setnumlockstate|setregview|setscrolllockstate|setstorecapslockmode|settitlematchmode|setwindelay|setworkingdir|shutdown|sort|soundbeep|soundget|soundgetwavevolume|soundplay|soundset|soundsetwavevolume|splashimage|splashtextoff|splashtexton|splitpath|statusbargettext|statusbarwait|stringcasesense|stringgetpos|stringleft|stringlen|stringlower|stringmid|stringreplace|stringright|stringsplit|stringtrimleft|stringtrimright|stringupper|sysget|thread|tooltip|transform|traytip|urldownloadtofile|winactivate|winactivatebottom|winclose|winget|wingetactivestats|wingetactivetitle|wingetclass|wingetpos|wingettext|wingettitle|winhide|winkill|winmaximize|winmenuselectitem|winminimize|winminimizeall|winminimizeallundo|winmove|winrestore|winset|winsettitle|winshow|winwait|winwaitactive|winwaitclose|winwaitnotactive"
@@ -14,6 +17,7 @@ HighlightAHK(Settings, ByRef Code)
 		((?:^|\s);[^\n]+)          ; Comments
 		|(^\s*\/\*.+?\n\s*\*\/)    ; Multiline comments
 		|((?:^|\s)#[^ \t\r\n,]+)   ; Directives
+		|(^\s*\(.+?(?=^\s*\)|\z))  ; Continuation Section
 		|([+*!~&\/\\<>^|=?:
 			,().```%{}\[\]\-]+)    ; Punctuation
 		|\b(0x[0-9a-fA-F]+|[0-9]+) ; Numbers
@@ -26,6 +30,8 @@ HighlightAHK(Settings, ByRef Code)
 		|\b(" Keywords ")\b        ; Other keywords
 		|(([a-zA-Z_$]+)(?=\())     ; Functions
 	)"
+	, Languages := {"ahk": Func("HighlightAHK"), "css": Func("HighlightCSS")
+	, "js": Func("HighlightJS"), "html": Func("HighlightHTML")}
 	
 	GenHighlighterCache(Settings)
 	Map := Settings.Cache.ColorMap
@@ -43,25 +49,41 @@ HighlightAHK(Settings, ByRef Code)
 			RTF .= "\cf" Map.Multiline
 		else if (Match.Value(3) != "")
 			RTF .= "\cf" Map.Directives
-		else if (Match.Value(4) != "")
+		else if (Match.Value(4) != "") {
+			RegExMatch(Match[4]
+			, "Oi)^(\s*\()(.*?)(;[ \t]*(ahk|css|js|html)?.*)?(?=\R|$)"
+			, Cont)
+			
+			RTF .= "\cf" Map.Punctuation " " EscapeRTF(Cont[1])
+			RTF .= "\cf" Map.Keywords " " EscapeRTF(Cont[2])
+			RTF .= "\cf" Map.Comments " " EscapeRTF(Cont[3])
+			
+			if (Cont[4] != "")
+				RTF .= Languages[Cont[4]].Call(Settings, SubStr(Match[4], Cont.Len()+1), True)
+			else
+				RTF .= "\cf" Map.Strings  " " EscapeRTF(SubStr(Match[4], Cont.Len()+1))
+			
+			Pos := FoundPos + Match.Len()
+			continue
+		} else if (Match.Value(5) != "")
 			RTF .= "\cf" Map.Punctuation
-		else if (Match.Value(5) != "")
-			RTF .= "\cf" Map.Numbers
 		else if (Match.Value(6) != "")
-			RTF .= "\cf" Map.Strings
+			RTF .= "\cf" Map.Numbers
 		else if (Match.Value(7) != "")
-			RTF .= "\cf" Map.A_Builtins
+			RTF .= "\cf" Map.Strings
 		else if (Match.Value(8) != "")
-			RTF .= "\cf" Map.Flow
+			RTF .= "\cf" Map.A_Builtins
 		else if (Match.Value(9) != "")
-			RTF .= "\cf" Map.Commands
+			RTF .= "\cf" Map.Flow
 		else if (Match.Value(10) != "")
-			RTF .= "\cf" Map.Functions
+			RTF .= "\cf" Map.Commands
 		else if (Match.Value(11) != "")
-			RTF .= "\cf" Map.Keynames
+			RTF .= "\cf" Map.Functions
 		else if (Match.Value(12) != "")
-			RTF .= "\cf" Map.Keywords
+			RTF .= "\cf" Map.Keynames
 		else if (Match.Value(13) != "")
+			RTF .= "\cf" Map.Keywords
+		else if (Match.Value(14) != "")
 			RTF .= "\cf" Map.Functions
 		else
 			RTF .= "\cf" Map.Plain
@@ -69,6 +91,9 @@ HighlightAHK(Settings, ByRef Code)
 		RTF .= " " EscapeRTF(Match.Value())
 		Pos := FoundPos + Match.Len()
 	}
+	
+	if Bare
+		return RTF . "\cf" Map.Plain " " EscapeRTF(SubStr(Code, Pos))
 	
 	return Settings.Cache.RTFHeader . RTF
 	. "\cf" Map.Plain " " EscapeRTF(SubStr(Code, Pos)) "\`n}"

@@ -14,7 +14,7 @@
 	9: Properties
 */
 
-HighlightCSS(Settings, ByRef Code, RTFHeader:="")
+HighlightCSS(Settings, ByRef Code, Bare:=False)
 {
 	static Needle := "
 	( LTrim Join Comments
@@ -68,6 +68,9 @@ HighlightCSS(Settings, ByRef Code, RTFHeader:="")
 		RTF .= " " EscapeRTF(Match.Value())
 		Pos := FoundPos + Match.Len()
 	}
+	
+	if Bare
+		return RTF . "\cf" Map.Plain " " EscapeRTF(SubStr(Code, Pos))
 	
 	return Settings.Cache.RTFHeader . RTF
 	. "\cf" Map.Plain " " EscapeRTF(SubStr(Code, Pos)) "\`n}"
