@@ -147,5 +147,5 @@ GuiControlGet, Language
 
 ; Set the new highlighter and contents
 RC.Settings.Highlighter := Codes[Language].Highlighter
-RC.Value := Codes[Language].Code
+RC.Text := Codes[Language].Code
 return

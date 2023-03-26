@@ -1,6 +1,6 @@
 ﻿GenHighlighterCache(Settings)
 {
-	if Settings.HasKey("Cache")
+	if Settings.HasOwnProp("Cache")
 		return
 	Cache := Settings.Cache := {}
 	
@@ -11,18 +11,19 @@
 	; Inherit from the Settings array's base
 	BaseSettings := Settings
 	while (BaseSettings := BaseSettings.Base)
-		for Name, Color in BaseSettings.Colors
-			if !Cache.Colors.HasKey(Name)
-				Cache.Colors[Name] := Color
+		if BaseSettings.HasProp("Colors")
+			for Name, Color in BaseSettings.Colors.OwnProps()
+				if !Cache.Colors.HasProp(Name)
+					Cache.Colors.%Name% := Color
 	
 	; Include the color of plain text
-	if !Cache.Colors.HasKey("Plain")
+	if !Cache.Colors.HasOwnProp("Plain")
 		Cache.Colors.Plain := Settings.FGColor
 	
 	; Create a Name->Index map of the colors
 	Cache.ColorMap := {}
-	for Name, Color in Cache.Colors
-		Cache.ColorMap[Name] := A_Index
+	for Name, Color in Cache.Colors.OwnProps()
+		Cache.ColorMap.%Name% := A_Index
 	
 	
 	; --- Generate the RTF headers ---
@@ -30,7 +31,7 @@
 	
 	; Color Table
 	RTF .= "{\colortbl;"
-	for Name, Color in Cache.Colors
+	for Name, Color in Cache.Colors.OwnProps()
 	{
 		RTF .= "\red"   Color>>16 & 0xFF
 		RTF .= "\green" Color>>8  & 0xFF
@@ -57,9 +58,9 @@
 
 GetCharWidthTwips(Font)
 {
-	static Cache := {}
+	static Cache := Map()
 	
-	if Cache.HasKey(Font.Typeface "_" Font.Size "_" Font.Bold)
+	if Cache.Has(Font.Typeface "_" Font.Size "_" Font.Bold)
 		return Cache[Font.Typeface "_" font.Size "_" Font.Bold]
 	
 	; Calculate parameters of CreateFont
@@ -86,21 +87,21 @@ GetCharWidthTwips(Font)
 	, "Str", Face   ; _In_ LPCTSTR lpszFace
 	, "UPtr")
 	hObj := DllCall("SelectObject", "UPtr", hDC, "UPtr", hFont, "UPtr")
-	VarSetCapacity(SIZE, 8, 0)
-	DllCall("GetTextExtentPoint32", "UPtr", hDC, "Str", "x", "Int", 1, "UPtr", &SIZE)
+	size := Buffer(8, 0)
+	DllCall("GetTextExtentPoint32", "UPtr", hDC, "Str", "x", "Int", 1, "Ptr", SIZE)
 	DllCall("SelectObject", "UPtr", hDC, "UPtr", hObj, "UPtr")
 	DllCall("DeleteObject", "UPtr", hFont)
 	DllCall("ReleaseDC", "UPtr", 0, "UPtr", hDC)
 	
 	; Convert to twpis
-	Twips := Round(NumGet(SIZE, 0, "UInt")*1440/A_ScreenDPI)
+	Twips := Round(NumGet(size, 0, "UInt")*1440/A_ScreenDPI)
 	Cache[Font.Typeface "_" Font.Size "_" Font.Bold] := Twips
 	return Twips
 }
 
 EscapeRTF(Code)
 {
-	for each, Char in ["\", "{", "}", "`n"]
+	for Char in ["\", "{", "}", "`n"]
 		Code := StrReplace(Code, Char, "\" Char)
 	return StrReplace(StrReplace(Code, "`t", "\tab "), "`r")
 }
