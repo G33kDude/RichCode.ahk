@@ -1,4 +1,4 @@
-﻿#Include %A_LineFile%\..\Util.ahk
+﻿#Include Util.ahk
 
 /*
 	Colors indices used:
@@ -14,52 +14,39 @@
 	9: Tags
 */
 
-HighlightHTML(Settings, ByRef Code, RTFHeader:="")
-{
+HighlightHTML(Settings, &Code) {
 	static Needle := "
 	( LTrim Join Comments
-		ODims)
+		Dims)
 		(\<\!--.*?--\>)       ; Multiline comments
 		|(<(?:\/\s*)?)(\w+)   ; Tags
 		|([<>\/])             ; Punctuation
 		|(&[#\w]+?;)          ; Entities
 		|((?<=[>;])[^<>&]+)   ; Text
-		|(""[^""]*""|'[^']*') ; Strings
+		|("[^"]*"|'[^']*')    ; Strings
 		|(\w+\s*)(=)          ; Attributes
 	)"
 	
 	GenHighlighterCache(Settings)
 	Map := Settings.Cache.ColorMap
 	
+	rtf := ""
 	Pos := 1
-	while (FoundPos := RegExMatch(Code, Needle, Match, Pos))
-	{
-		RTF .= "\cf" Map.Plain " "
-		RTF .= EscapeRTF(SubStr(Code, Pos, FoundPos-Pos))
-		
-		; Flat block of if statements for performance
-		if (Match.Value(1) != "")
-			RTF .= "\cf" Map.Multiline " " EscapeRTF(Match.Value(1))
-		else if (Match.Value(2) != "")
-		{
-			RTF .= "\cf" Map.Punctuation " " EscapeRTF(Match.Value(2))
-			RTF .= "\cf" Map.Tags " " EscapeRTF(Match.Value(3))
-		}
-		else if (Match.Value(4) != "")
-			RTF .= "\cf" Map.Punctuation " " Match.Value(4)
-		else if (Match.Value(5) != "")
-			RTF .= "\cf" Map.Entities " " EscapeRTF(Match.Value(5))
-		else if (Match.Value(6) != "")
-			RTF .= "\cf" Map.Plain " " EscapeRTF(Match.Value(6))
-		else if (Match.Value(7) != "")
-			RTF .= "\cf" Map.Strings " " EscapeRTF(Match.Value(7))
-		else if (Match.Value(8) != "")
-		{
-			RTF .= "\cf" Map.Attributes " " EscapeRTF(Match.Value(8))
-			RTF .= "\cf" Map.Punctuation " " Match.Value(9)
-		}
-		
-		Pos := FoundPos + Match.Len()
+	while FoundPos := RegExMatch(Code, Needle, &Match, Pos) {
+		RTF .= (
+			"\cf" Map.Plain " "
+			EscapeRTF(SubStr(Code, Pos, FoundPos - Pos))
+			"\cf" (
+				Match.1 ? Map.Multiline " " EscapeRTF(Match.1) :
+				Match.2 ?  Map.Punctuation " " EscapeRTF(Match.2) "\cf" Map.Tags " " EscapeRTF(Match.3) :
+				Match.4 ? Map.Punctuation " " Match.4 :
+				Match.5 ? Map.Entities " " EscapeRTF(Match.5) :
+				Match.6 ? Map.Plain " " EscapeRTF(Match.6) :
+				Match.7 ? Map.Strings " " EscapeRTF(Match.7) :
+				Match.8 ?  Map.Attributes " " EscapeRTF(Match.8) "\cf" Map.Punctuation " " Match.9 :
+				Map.Plain
+			)
+		), Pos := FoundPos + Match.Len()
 	}
 	
 	return Settings.Cache.RTFHeader . RTF

@@ -1,151 +1,150 @@
-﻿#NoEnv
-SetBatchLines, -1
-SetWorkingDir, %A_ScriptDir%
+﻿#Requires AutoHotkey v2.0
 
-#Include %A_ScriptDir%\..
-#Include RichCode.ahk
-#Include Highlighters\AHK.ahk
-#Include Highlighters\CSS.ahk
-#Include Highlighters\HTML.ahk
-#Include Highlighters\JS.ahk
+#Include ..\RichCode.ahk
+#Include ..\Highlighters\AHK.ahk
+#Include ..\Highlighters\CSS.ahk
+#Include ..\Highlighters\HTML.ahk
+#Include ..\Highlighters\JS.ahk
 
 ; Table of supported languages and sample codes for the demo
-Codes :=
-( LTrim Join Comments
-{
-	"AHK": {
-		"Highlighter": "HighlightAHK",
-		"Code": FileOpen(A_ScriptFullPath, "r").Read()
+codes := Map(
+	"AHK", {
+		Highlighter: HighlightAHK,
+		Code: FileRead(A_ScriptFullPath) ;FileOpen(A_ScriptFullPath, "r").Read()
 	},
-	"HTML": {
-		"Highlighter": "HighlightHTML",
-		"Code": FileOpen("Language Samples\Sample.html", "r").Read()
+	"HTML", {
+		Highlighter: HighlightHTML,
+		Code: FileOpen("Language Samples\Sample.html", "r").Read()
 	},
-	"CSS": {
-		"Highlighter": "HighlightCSS",
-		"Code": FileOpen("Language Samples\Sample.css", "r").Read()
+	"CSS", {
+		Highlighter: HighlightCSS,
+		Code: FileOpen("Language Samples\Sample.css", "r").Read()
 	},
-	"JS": {
-		"Highlighter": "HighlightJS",
-		"Code": FileOpen("Language Samples\Sample.js", "r").Read()
+	"JS", {
+		Highlighter: HighlightJS,
+		Code: FileOpen("Language Samples\Sample.js", "r").Read()
 	},
-	"Plain": {
-		"Highlighter": "",
-		"Code": FileOpen("Language Samples\Sample.txt", "r").Read()
+	"Plain", {
+		Highlighter: false,
+		Code: FileOpen("Language Samples\Sample.txt", "r").Read()
 	}
-}
 )
 
 ; Settings array for the RichCode control
-Settings :=
-( LTrim Join Comments
-{
-	"TabSize": 4,
-	"Indent": "`t",
-	"FGColor": 0xEDEDCD,
-	"BGColor": 0x3F3F3F,
-	"Font": {"Typeface": "Consolas", "Size": 11},
-	"WordWrap": False,
+settings := {
+	TabSize: 4,
+	Indent: "`t",
+	FGColor: 0xEDEDCD,
+	BGColor: 0x3F3F3F,
+	Font: {Typeface: "Consolas", Size: 11, Bold: false},
+	WordWrap: False,
 	
-	"UseHighlighter": True,
-	"HighlightDelay": 200,
-	"Colors": {
-		"Comments":     0x7F9F7F,
-		"Functions":    0x7CC8CF,
-		"Keywords":     0xE4EDED,
-		"Multiline":    0x7F9F7F,
-		"Numbers":      0xF79B57,
-		"Punctuation":  0x97C0EB,
-		"Strings":      0xCC9893,
+	UseHighlighter: True,
+	HighlightDelay: 200,
+	Colors: {
+		Comments:     0x7F9F7F,
+		Functions:    0x7CC8CF,
+		Keywords:     0xE4EDED,
+		Multiline:    0x7F9F7F,
+		Numbers:      0xF79B57,
+		Punctuation:  0x97C0EB,
+		Strings:      0xCC9893,
 		
 		; AHK
-		"A_Builtins":   0xF79B57,
-		"Commands":     0xCDBFA3,
-		"Directives":   0x7CC8CF,
-		"Flow":         0xE4EDED,
-		"KeyNames":     0xCB8DD9,
+		A_Builtins:   0xF79B57,
+		Commands:     0xCDBFA3,
+		Directives:   0x7CC8CF,
+		Flow:         0xE4EDED,
+		KeyNames:     0xCB8DD9,
 		
 		; CSS
-		"ColorCodes":   0x7CC8CF,
-		"Properties":   0xCDBFA3,
-		"Selectors":    0xE4EDED,
+		ColorCodes:   0x7CC8CF,
+		Properties:   0xCDBFA3,
+		Selectors:    0xE4EDED,
 		
 		; HTML
-		"Attributes":   0x7CC8CF,
-		"Entities":     0xF79B57,
-		"Tags":         0xCDBFA3,
+		Attributes:   0x7CC8CF,
+		Entities:     0xF79B57,
+		Tags:         0xCDBFA3,
 		
 		; JS
-		"Builtins":     0xE4EDED,
-		"Constants":    0xF79B57,
-		"Declarations": 0xCDBFA3
+		Builtins:     0xE4EDED,
+		Constants:    0xF79B57,
+		Declarations: 0xCDBFA3
 	}
 }
-)
 
 ; Add some controls
-Gui, Add, DropDownList, gChangeLang vLanguage, AHK||CSS|HTML|JS|Plain
-Gui, Add, Button, ym gBlockComment, Block &Comment
-Gui, Add, Button, ym gBlockUncomment, Block &Uncomment
+g := Gui()
+g.AddDropDownList("vLanguage Choose1", ["AHK", "CSS", "HTML", "JS", "Plain"]).OnEvent("Change", ChangeLang)
+g.AddButton("ym", "Block &Comment").OnEvent("Click", BlockComment)
+g.AddButton("ym", "Block &Uncomment").OnEvent("Click", BlockUncomment)
+g.OnEvent("Close", GuiClose)
 
 ; Add the RichCode
-RC := new RichCode(Settings, "xm w640 h470")
-GuiControl, Focus, % RC.hWnd
+rc := RichCode(g, settings, "xm w640 h470")
 
 ; Set its starting contents
-GoSub, ChangeLang
+ChangeLang()
 
-Gui, Show
-return
-
-
-GuiClose:
-; Overwrite RC, leaving the only reference from the GUI
-RC := ""
-
-; Destroy the GUI, freeing the RichCode instance
-Gui, Destroy
-
-; Close the script
-ExitApp
-return
+g.Show()
 
 
-BlockComment:
-; Get the selected language from the GUI
-GuiControlGet, Language
+GuiClose(*) {
+	global rc
 
-; Apply an appropriate block comment transformation
-if (Language == "AHK")
-	RC.IndentSelection(False, ";")
-else if (Language == "HTML")
-	RC.SelectedText := "<!-- " RC.SelectedText " -->"
-else if (Language == "CSS" || Language == "JS")
-	RC.SelectedText := "/* " RC.SelectedText " */"
-return
+	; Overwrite rc, leaving the only reference from the GUI
+	rc := ""
 
-BlockUncomment:
-; Get the selected language from the GUI
-GuiControlGet, Language
+	; Destroy the GUI, freeing the RichCode instance
+	g.Destroy()
 
-; Remove an appropriate block comment transformation
-if (Language == "AHK")
-	RC.IndentSelection(True, ";")
-else if (Language == "HTML")
-	RC.SelectedText := RegExReplace(RC.SelectedText, "s)<!-- ?(.+?) ?-->", "$1")
-else if (Language == "CSS" || Language == "JS")
-	RC.SelectedText := RegExReplace(RC.SelectedText, "s)\/\* ?(.+?) ?\*\/", "$1")
-return
+	; Close the script
+	ExitApp
+}
 
-ChangeLang:
-; Keep a back up of the contents
-if Language
-	Codes[Language].Code := RC.Value
 
-; Get the selected language from the GUI
-GuiControlGet, Language
+BlockComment(*) {
+	global language
 
-; Set the new highlighter and contents
-RC.Settings.Highlighter := Codes[Language].Highlighter
-RC.Text := Codes[Language].Code
-return
+	; Get the selected language from the GUI
+	language := g["Language"].Text
+
+	; Apply an appropriate block comment transformation
+	if language == "AHK"
+		rc.IndentSelection(false, ";")
+	else if language == "HTML"
+		rc.SelectedText := "<!-- " rc.SelectedText " -->"
+	else if language == "CSS" || language == "JS"
+		rc.SelectedText := "/* " rc.SelectedText " */"
+}
+
+BlockUncomment(*) {
+	global language
+
+	; Get the selected language from the GUI
+	language := g["Language"].Text
+
+	; Remove an appropriate block comment transformation
+	if language == "AHK"
+		rc.IndentSelection(True, ";")
+	else if language == "HTML"
+		rc.SelectedText := RegExReplace(rc.SelectedText, "s)<!-- ?(.+?) ?-->", "$1")
+	else if language == "CSS" || language == "JS"
+		rc.SelectedText := RegExReplace(rc.SelectedText, "s)\/\* ?(.+?) ?\*\/", "$1")
+}
+
+ChangeLang(*) {
+	global language
+
+	; Keep a back up of the contents
+	if IsSet(language)
+		codes[language].Code := rc.Text
+
+	; Get the selected language from the GUI
+	language := g["Language"].Text
+
+	; Set the new highlighter and contents
+	rc.Settings.Highlighter := codes[language].Highlighter
+	rc.Text := codes[language].Code
+}

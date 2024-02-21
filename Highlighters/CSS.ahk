@@ -1,4 +1,4 @@
-﻿#Include %A_LineFile%\..\Util.ahk
+﻿#Include Util.ahk
 
 /*
 	Colors indices used:
@@ -14,11 +14,10 @@
 	9: Properties
 */
 
-HighlightCSS(Settings, ByRef Code, RTFHeader:="")
-{
+HighlightCSS(Settings, &Code) {
 	static Needle := "
 	( LTrim Join Comments
-		ODims)
+		Dims)
 		(\/\*.*?\*\/)                     ; Multiline comments
 		|(\.[a-zA-Z_\-0-9]+)(?=[^}]*\{)   ; Classes
 		|(\#[a-zA-Z_\-0-9]+)(?=[^}]*\{)   ; IDs
@@ -30,45 +29,40 @@ HighlightCSS(Settings, ByRef Code, RTFHeader:="")
 			|vw|vmin|vmax|s|deg))?)
 		|([+*!~&\/\\<>^|=?:@;
 			,().```%{}\[\]\-])            ; Punctuation
-		|(""[^""]*""|'[^']*')             ; Strings
+		|("[^"]*"|'[^']*')                ; Strings
 		|([\w-]+\s*(?=:[^:]))             ; Properties
 	)"
 	
 	GenHighlighterCache(Settings)
 	Map := Settings.Cache.ColorMap
 	
+	rtf := ""
 	Pos := 1
-	while (FoundPos := RegExMatch(Code, Needle, Match, Pos))
-	{
-		RTF .= "\cf" Map.Plain " "
-		RTF .= EscapeRTF(SubStr(Code, Pos, FoundPos-Pos))
-		
-		; Flat block of if statements for performance
-		if (Match.Value(1) != "")
-			RTF .= "\cf" Map.Multiline
-		else if (Match.Value(2) != "")
-			RTF .= "\cf" Map.Selectors
-		else if (Match.Value(3) != "")
-			RTF .= "\cf" Map.Selectors
-		else if (Match.Value(4) != "")
-			RTF .= "\cf" Map.Selectors
-		else if (Match.Value(5) != "")
-			RTF .= "\cf" Map.ColorCodes
-		else if (Match.Value(6) != "")
-			RTF .= "\cf" Map.Numbers
-		else if (Match.Value(7) != "")
-			RTF .= "\cf" Map.Punctuation
-		else if (Match.Value(8) != "")
-			RTF .= "\cf" Map.Strings
-		else if (Match.Value(9) != "")
-			RTF .= "\cf" Map.Properties
-		else
-			RTF .= "\cf" Map.Plain
-		
-		RTF .= " " EscapeRTF(Match.Value())
-		Pos := FoundPos + Match.Len()
+	while FoundPos := RegExMatch(Code, Needle, &Match, Pos) {
+		RTF .= (
+			"\cf" Map.Plain " "
+			EscapeRTF(SubStr(Code, Pos, FoundPos - Pos))
+			"\cf" (
+				Match.1 ? Map.Multiline :
+				Match.2 ? Map.Selectors :
+				Match.3 ? Map.Selectors :
+				Match.4 ? Map.Selectors :
+				Match.5 ? Map.ColorCodes :
+				Match.6 ? Map.Numbers :
+				Match.7 ? Map.Punctuation :
+				Match.8 ? Map.Strings :
+				Match.9 ? Map.Properties :
+				Map.Plain
+			) " "
+			EscapeRTF(Match.0)
+		), Pos := FoundPos + Match.Len()
 	}
 	
-	return Settings.Cache.RTFHeader . RTF
-	. "\cf" Map.Plain " " EscapeRTF(SubStr(Code, Pos)) "\`n}"
+	return (
+		Settings.Cache.RTFHeader
+		RTF
+		"\cf" Map.Plain " "
+		EscapeRTF(SubStr(Code, Pos))
+		"\`n}"
+	)
 }
